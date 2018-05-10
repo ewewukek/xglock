@@ -50,7 +50,6 @@ struct xrandr {
 /* update screen each (SKIP_FRAMES+1)-th frame */
 static const int SKIP_FRAMES = 3;
 
-static const char *bg_color_named = "#5C5C5C";
 static const float bg_color[3] = { 0.36, 0.36, 0.36 }; // #5C5C5C
 static const float logo_color[3] = { 0.09, 0.58, 0.82 }; // #1793D1
 static const float text_color[3] = { 1, 1, 1 }; // #FFFFFF
@@ -470,10 +469,9 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 	char curs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 	int i, ptgrab, kbgrab;
 	struct lock *lock;
-	XColor color, dummy;
+	XColor color;
 	XSetWindowAttributes wa;
 	XVisualInfo *vi;
-	Colormap cmap;
 	Cursor invisible;
 	int width, height, depth;
 
@@ -494,20 +492,16 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 	if (!vi)
 		die(APP_NAME ": cannot choose visual\n");
 
-	cmap = XCreateColormap(dpy, lock->root, vi->visual, AllocNone);
-	XAllocNamedColor(dpy, cmap, bg_color_named, &color, &dummy);
-
 	wa.override_redirect = 1;
-	wa.background_pixel = color.pixel;
-	wa.colormap = cmap;
+	wa.colormap = XCreateColormap(dpy, lock->root, vi->visual, AllocNone);
 
 	lock->win = XCreateWindow(dpy, lock->root, 0, 0,
 	                          width,
 	                          height,
 	                          0, depth,
-	                          CopyFromParent,
-	                          DefaultVisual(dpy, lock->screen),
-	                          CWOverrideRedirect | CWBackPixel, &wa);
+	                          InputOutput,
+	                          vi->visual,
+	                          CWOverrideRedirect | CWColormap, &wa);
 	lock->pmap = XCreateBitmapFromData(dpy, lock->win, curs, 8, 8);
 	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap,
 	                                &color, &color, 0, 0);
