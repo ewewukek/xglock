@@ -157,6 +157,7 @@ gethash(void)
 	}
 	hash = pw->pw_passwd;
 
+#ifndef DEBUG
 #if HAVE_SHADOW_H
 	if (!strcmp(hash, "x")) {
 		struct spwd *sp;
@@ -178,6 +179,7 @@ gethash(void)
 #endif /* __OpenBSD__ */
 	}
 #endif /* HAVE_SHADOW_H */
+#endif /* DEBUG */
 
 	return hash;
 }
@@ -408,10 +410,14 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 			case XK_Return:
 				passwd[len] = '\0';
 				errno = 0;
+#ifndef DEBUG
 				if (!(inputhash = crypt(passwd, hash)))
 					fprintf(stderr, APP_NAME ": crypt: %s\n", strerror(errno));
 				else
 					running = !!strcmp(inputhash, hash);
+#else
+				running = 0;
+#endif /* DEBUG */
 				if (running) {
 					XBell(dpy, 100);
 					gettimeofday(&error_time, NULL);
@@ -601,6 +607,7 @@ main(int argc, char **argv) {
 		    errno ? strerror(errno) : "group entry not found");
 	dgid = grp->gr_gid;
 
+#ifndef DEBUG
 #ifdef __linux__
 	dontkillme();
 #endif
@@ -609,10 +616,12 @@ main(int argc, char **argv) {
 	errno = 0;
 	if (!crypt("", hash))
 		die(APP_NAME ": crypt: %s\n", strerror(errno));
+#endif /* DEBUG */
 
 	if (!(dpy = XOpenDisplay(NULL)))
 		die(APP_NAME ": cannot open display\n");
 
+#ifndef DEBUG
 	/* drop privileges */
 	if (setgroups(0, NULL) < 0)
 		die(APP_NAME ": setgroups: %s\n", strerror(errno));
@@ -620,6 +629,7 @@ main(int argc, char **argv) {
 		die(APP_NAME ": setgid: %s\n", strerror(errno));
 	if (setuid(duid) < 0)
 		die(APP_NAME ": setuid: %s\n", strerror(errno));
+#endif /* DEBUG */
 
 	/* check for Xrandr support */
 	rr.active = XRRQueryExtension(dpy, &rr.evbase, &rr.errbase);

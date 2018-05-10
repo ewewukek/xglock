@@ -8,6 +8,10 @@ OBJ = ${SRC:.c=.o}
 
 all: options xglock
 
+debug: CFLAGS += -DDEBUG -g
+debug: LDFLAGS := $(filter-out -s,$(LDFLAGS))
+debug: all
+
 options:
 	@echo xglock build options:
 	@echo "CFLAGS   = ${CFLAGS}"
@@ -15,7 +19,7 @@ options:
 	@echo "CC       = ${CC}"
 
 .c.o:
-	@echo CC $<
+	@echo CC -c ${CFLAGS} $<
 	@${CC} -c ${CFLAGS} $<
 
 ${OBJ}: config.h config.mk arg.h util.h
@@ -25,7 +29,7 @@ config.h:
 	@cp config.def.h $@
 
 xglock: ${OBJ}
-	@echo CC -o $@
+	@echo @${CC} -o $@ ${OBJ} ${LDFLAGS}
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
