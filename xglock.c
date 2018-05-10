@@ -374,7 +374,6 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 			skip = 0;
 			for(screen = 0; screen != nscreens; ++screen) {
 				struct lock *lock = locks[screen];
-				glXMakeCurrent(dpy, lock->win, lock->glc);
 				draw(angle, error);
 				glXSwapBuffers(dpy, lock->win);
 			}
@@ -455,8 +454,7 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 						new_height = rre->height;
 					}
 					XResizeWindow(dpy, locks[screen]->win,
-								  new_height, new_width);
-					glXMakeCurrent(dpy, locks[screen]->win, locks[screen]->glc);
+								  new_width, new_height);
 					screen_updated(new_width, new_height);
 					break;
 				}
