@@ -46,10 +46,6 @@ struct xrandr {
 
 #include "config.h"
 
-
-/* update screen each (SKIP_FRAMES+1)-th frame */
-static const int SKIP_FRAMES = 3;
-
 static const float bg_color[3] = { 0.36, 0.36, 0.36 }; // #5C5C5C
 static const float logo_color[3] = { 0.09, 0.58, 0.82 }; // #1793D1
 static const float text_color[3] = { 1, 1, 1 }; // #FFFFFF
