@@ -19,8 +19,10 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
+#include <X11/extensions/XKB.h>
 #include <X11/extensions/Xrandr.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -627,6 +629,9 @@ main(int argc, char **argv) {
 
 	/* check for Xrandr support */
 	rr.active = XRRQueryExtension(dpy, &rr.evbase, &rr.errbase);
+
+	/* switch keyboard layout to first group */
+	XkbLockGroup(dpy, XkbUseCoreKbd, 0);
 
 	/* get number of screens in display "dpy" and blank them */
 	nscreens = ScreenCount(dpy);
